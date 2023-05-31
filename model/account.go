@@ -13,20 +13,15 @@ type User struct {
 }
 
 type UserInfo struct {
-	Nickname      string `json:"nickname" gorm:"nickname"`
-	Avatar        string `json:"avatar" gorm:"avatar"`
-	SchoolID      int    `json:"schoolID" gorm:"school_id"`
-	CampusID      string `json:"campusID" gorm:"campus_id"`
-	School        string `json:"school"`
-	Campus        string `json:"campus"`
-	CampusAddress string `json:"campusAddress"`
+	Nickname string `json:"nickname" gorm:"nickname"`
+	Avatar   string `json:"avatar" gorm:"avatar"`
 }
 
 type UserInfoReadOnly struct {
-	Email      string `gorm:"email" json:"email"`
-	Phone      string `gorm:"phone" json:"phone"`
-	Username   string `gorm:"column:username;unique" json:"username"`
-	IsHorseman *bool  `gorm:"is_horseman" json:"isHorseman"`
+	Email    string `gorm:"email" json:"email"`
+	Phone    string `gorm:"phone" json:"phone"`
+	Username string `gorm:"column:username;unique" json:"username"`
+	Gender   rune   `gorm:"gender" json:"gender"`
 	UserInfo
 }
 
@@ -59,7 +54,7 @@ type ResetPasswordParameters struct {
 }
 
 type ChangePasswordParameters struct {
-	Username    string `json:"username,omitempty"`
-	OldPassword string `json:"oldPassword,omitempty"`
-	NewPassword string `json:"newPassword,omitempty"`
+	Username    string `json:"username"`
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
 }
