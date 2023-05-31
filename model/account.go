@@ -21,7 +21,7 @@ type UserInfoReadOnly struct {
 	Email    string `gorm:"email" json:"email"`
 	Phone    string `gorm:"phone" json:"phone"`
 	Username string `gorm:"column:username;unique" json:"username"`
-	Gender   rune   `gorm:"gender" json:"gender"`
+	Gender   rune   `gorm:"gender;type:char(1)" json:"gender"`
 	UserInfo
 }
 
