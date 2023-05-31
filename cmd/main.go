@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"server_template/common"
 	"server_template/db"
 	"server_template/route"
@@ -64,17 +65,24 @@ func main() {
 		}
 
 		// Write the configuration to a file
-		err = ioutil.WriteFile("template_config.json", configJSON, 0644)
+		err = ioutil.WriteFile("service_config_temp.json", configJSON, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println("Template configuration file generated at 'template_config.json'")
+		fmt.Println("Template configuration file generated at 'service_config_temp.json'")
 		return
 	}
 
+	// If no configuration file specified, try to read default configuration file in current directory
 	if *configFile == "" {
-		log.Fatal("No configuration file specified. Use the '-c' flag to specify the path to the configuration file.")
+		if _, err := os.Stat("service_config.json"); err == nil {
+			*configFile = "service_config.json"
+		} else if _, err := os.Stat("service_config.json5"); err == nil {
+			*configFile = "service_config.json5"
+		} else {
+			log.Fatal("No configuration file specified. Use the '-c' flag to specify the path to the configuration file or place a default configuration file 'service_config.json' or 'service_config.json5' in the current directory.")
+		}
 	}
 
 	// Read the configuration file
