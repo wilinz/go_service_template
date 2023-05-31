@@ -5,22 +5,22 @@ import "server_template/mytime"
 type User struct {
 	ID int64 `gorm:"id" json:"id"`
 	UserInfoReadOnly
-	Password  string                `gorm:"password"`
-	Salt      string                `gorm:"salt"`
+	Password  string                `gorm:"password;type:char(64)"`
+	Salt      string                `gorm:"salt;type:char(6)"`
 	CreatedAt mytime.CustomTime     `json:"-"`
 	UpdatedAt mytime.CustomTime     `json:"-"`
 	DeletedAt mytime.CustomNullTime `json:"-" gorm:"index"`
 }
 
 type UserInfo struct {
-	Nickname string `json:"nickname" gorm:"nickname"`
-	Avatar   string `json:"avatar" gorm:"avatar"`
+	Nickname string `json:"nickname" gorm:"nickname;type:varchar(255)"`
+	Avatar   string `json:"avatar" gorm:"avatar;type:varchar(2048)"`
 }
 
 type UserInfoReadOnly struct {
-	Email    string `gorm:"email" json:"email"`
-	Phone    string `gorm:"phone" json:"phone"`
-	Username string `gorm:"column:username;unique" json:"username"`
+	Email    string `gorm:"email;type:varchar(255)" json:"email"`
+	Phone    string `gorm:"phone;type:varchar(25)" json:"phone"`
+	Username string `gorm:"column:username;unique;type:varchar(255)" json:"username"`
 	Gender   rune   `gorm:"gender;type:char(1)" json:"gender"`
 	UserInfo
 }
