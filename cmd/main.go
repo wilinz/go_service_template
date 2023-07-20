@@ -10,11 +10,13 @@ import (
 	"server_template/common"
 	"server_template/db"
 	"server_template/route"
+	"server_template/service/account"
 	"server_template/service/proxy"
 	"server_template/tools"
 )
 
 type ServiceConfig struct {
+	AppName           string                  `json:"app_name"`
 	MysqlConfig       db.MysqlConfig          `json:"mysql_config"`
 	RedisConfig       db.RedisConfig          `json:"redis_config"`
 	EmailConfig       tools.EmailConfig       `json:"email_config"`
@@ -34,6 +36,7 @@ func main() {
 	if *genTemplate {
 		// Generate template configuration file
 		config := ServiceConfig{
+			AppName: "GoodApp",
 			MysqlConfig: db.MysqlConfig{
 				Host:     "localhost",
 				Port:     3306,
@@ -99,6 +102,7 @@ func main() {
 	}
 
 	// Initialize the service using the configuration
+	account.SetAppName(config.AppName)
 	db.InitMySql(config.MysqlConfig)
 	db.InitRedis(config.RedisConfig)
 	tools.InitEmail(config.EmailConfig)

@@ -16,6 +16,12 @@ import (
 	"time"
 )
 
+var appName string
+
+func SetAppName(value string) {
+	appName = value
+}
+
 func VerificationCodeHandler(c *gin.Context) {
 	var p model.VerificationParameters
 	err := c.Bind(&p)
@@ -62,7 +68,7 @@ func VerificationCodeHandler(c *gin.Context) {
 	code := util.GetRandomCode(6)
 
 	if util.IsEmail(p.PhoneOrEmail) {
-		err := tools.SendCodeToEmail(p.PhoneOrEmail, fmt.Sprintf("[xxx]您的验证码是：%s。此验证码10分钟后失效，请勿泄露。", code))
+		err := tools.SendCodeToEmail(p.PhoneOrEmail, fmt.Sprintf("[%s]您的验证码是：%s。此验证码10分钟后失效，请勿泄露。", appName, code))
 		if err != nil {
 			c.JSON(200, model.JsonResponse{
 				Code: error_code.SendCodeFailed,
