@@ -58,6 +58,7 @@ func main() {
 			CustomProxyConfig: proxy.CustomProxyConfig{
 				ProxyServer: "localhost",
 				Key:         "",
+				Timeout:     300,
 			},
 		}
 
