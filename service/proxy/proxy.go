@@ -35,7 +35,7 @@ func HttpProxyHandler(c *gin.Context) {
 
 	c.Writer.Header().Set("Access-Control-Allow-Origin", c.Request.Header.Get("Origin"))
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "*")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "X-Referer, X-SMTPUsername-Agent")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "X-Referer, X-User-Agent")
 	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 
