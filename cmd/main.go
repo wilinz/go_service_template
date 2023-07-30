@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/titanous/json5"
 	"io/ioutil"
 	"log"
 	"os"
@@ -97,7 +98,7 @@ func main() {
 
 	// Unmarshal the configuration JSON into a ServiceConfig struct
 	var config ServiceConfig
-	err = json.Unmarshal(configJSON, &config)
+	err = json5.Unmarshal(configJSON, &config)
 	if err != nil {
 		log.Fatal(err)
 	}

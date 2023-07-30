@@ -11,6 +11,7 @@ require (
 	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/sessions v1.2.1
 	github.com/rbcervilla/redisstore/v8 v8.1.0
+	github.com/titanous/json5 v1.0.0
 	github.com/weili71/go-filex v0.0.0-20201219163537-91939a07f58f
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.1.3
