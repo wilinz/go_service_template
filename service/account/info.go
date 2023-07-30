@@ -15,7 +15,7 @@ func SetUserInfoHandler(c *gin.Context) {
 		return
 	}
 
-	logged, username := IsLogged(c)
+	logged, username := IsLoggedWithResponse(c)
 	if !logged {
 		return
 	}
@@ -35,7 +35,7 @@ func SetUserInfoHandler(c *gin.Context) {
 }
 
 func GetUserInfoHandler(c *gin.Context) {
-	logged, username := IsLogged(c)
+	logged, username := IsLoggedWithResponse(c)
 	if !logged {
 		return
 	}

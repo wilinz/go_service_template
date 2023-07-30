@@ -103,7 +103,7 @@ func main() {
 	}
 
 	// Initialize the service using the configuration
-	account.SetAppName(config.AppName)
+	account.InitAppName(config.AppName)
 	db.InitMySql(config.MysqlConfig)
 	db.InitRedis(config.RedisConfig)
 	tools.InitEmail(config.EmailConfig)

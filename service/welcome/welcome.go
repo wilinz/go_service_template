@@ -7,7 +7,7 @@ import (
 )
 
 func WelcomeHandler(c *gin.Context) {
-	logged, _ := account.IsLogged(c)
+	logged, _ := account.IsLoggedWithResponse(c)
 	if !logged {
 		return
 	}

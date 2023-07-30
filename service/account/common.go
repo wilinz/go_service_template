@@ -2,6 +2,7 @@ package account
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"log"
 	"net/http"
 	"server_template/common"
@@ -12,7 +13,6 @@ import (
 	"server_template/db"
 	"server_template/model"
 	"server_template/util"
-	"time"
 )
 
 func IsPasswordCorrect(c *gin.Context, username string, password string) bool {
@@ -24,7 +24,7 @@ func IsPasswordCorrect(c *gin.Context, username string, password string) bool {
 		c.JSON(200, model.JsonResponse{
 			Code: error_code.RequestTooFrequent,
 			Msg:  "请求过于频繁",
-			Data: ttl,
+			Data: ttl.String(),
 		})
 		return false
 	}
@@ -48,16 +48,8 @@ func IsPasswordCorrect(c *gin.Context, username string, password string) bool {
 		return true
 	}
 
-	//获取ttl
-	var ttl = time.Hour * 1
-	if errorCount > 0 {
-		if ttlCmd := db.Redis.TTL(db.Context, key); ttlCmd.Err() == nil {
-			ttl = ttlCmd.Val()
-		}
-	}
-
 	//更新计数
-	db.Redis.Set(db.Context, key, errorCount+1, ttl)
+	db.Redis.Set(db.Context, key, errorCount+1, redis.KeepTTL)
 
 	c.JSON(200, model.JsonResponse{
 		Code: error_code.PasswordError,
@@ -121,15 +113,8 @@ func IsVerificationCodeCorrect(c *gin.Context, code, codeType, username string) 
 		return true
 	}
 
-	//获取ttl
-	var ttl = verification_code.Interval
-	if errorCount > 0 {
-		if ttlCmd := db.Redis.TTL(db.Context, codeKey); ttlCmd.Err() == nil {
-			ttl = ttlCmd.Val()
-		}
-	}
 	//更新计数
-	db.Redis.Set(db.Context, TryCountKey, errorCount+1, ttl)
+	db.Redis.Set(db.Context, TryCountKey, errorCount+1, redis.KeepTTL)
 
 	log.Println("验证码错误")
 	c.JSON(200, model.JsonResponse{
@@ -140,8 +125,8 @@ func IsVerificationCodeCorrect(c *gin.Context, code, codeType, username string) 
 	return false
 }
 
-func IsLogged(c *gin.Context) (bool, string) {
-	logged, username, err := isLogged(c)
+func IsLoggedWithResponse(c *gin.Context) (bool, string) {
+	logged, username, err := IsLogged(c)
 	if !logged || err != nil {
 		c.JSON(http.StatusUnauthorized, model.JsonResponse{
 			Code: error_code.Unverified,
@@ -152,7 +137,7 @@ func IsLogged(c *gin.Context) (bool, string) {
 	return logged, username
 }
 
-func isLogged(c *gin.Context) (bool, string, error) {
+func IsLogged(c *gin.Context) (bool, string, error) {
 	session, err := common.Sessions.Get(c.Request, "session-key")
 	var username, exist = session.Values["username"].(string)
 	return exist, username, err

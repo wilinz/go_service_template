@@ -3,6 +3,7 @@ package account
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"log"
 	"server_template/constant/error_code"
 	"server_template/constant/redis_prefix"
@@ -12,14 +13,13 @@ import (
 	"server_template/service"
 	"server_template/tools"
 	"server_template/util"
-	"strconv"
 	"time"
 )
 
 var appName string
 
-func SetAppName(value string) {
-	appName = value
+func InitAppName(name string) {
+	appName = name
 }
 
 func VerificationCodeHandler(c *gin.Context) {
@@ -41,8 +41,8 @@ func VerificationCodeHandler(c *gin.Context) {
 			ttl := db.Redis.TTL(db.Context, codeCountKey).Val()
 			c.JSON(200, model.JsonResponse{
 				Code: error_code.CodeExceededDailyMax,
-				Msg:  fmt.Sprintf("请%d小时后再试", ttl/time.Hour),
-				Data: strconv.Itoa(int(ttl)),
+				Msg:  fmt.Sprintf("请 %s 后再试", ttl.String()),
+				Data: ttl.String(),
 			})
 			return
 		}
@@ -57,8 +57,8 @@ func VerificationCodeHandler(c *gin.Context) {
 			countdown := verification_code.Interval - elapsedTime
 			c.JSON(200, model.JsonResponse{
 				Code: error_code.RequestTooFrequent,
-				Msg:  fmt.Sprintf("请在%ds后获取", countdown/time.Second),
-				Data: countdown / time.Second,
+				Msg:  fmt.Sprintf("请在 %s 后获取", countdown.String()),
+				Data: countdown.String(),
 			})
 			return
 		}
@@ -72,7 +72,7 @@ func VerificationCodeHandler(c *gin.Context) {
 		if err != nil {
 			c.JSON(200, model.JsonResponse{
 				Code: error_code.SendCodeFailed,
-				Msg:  "发送代码失败",
+				Msg:  "发送验证码失败",
 				Data: nil,
 			})
 			log.Println(err)
@@ -96,8 +96,7 @@ func VerificationCodeHandler(c *gin.Context) {
 
 	//更新计数
 	if countIsExist {
-		ttl := db.Redis.TTL(db.Context, codeCountKey).Val()
-		db.Redis.Set(db.Context, codeCountKey, count+1, ttl)
+		db.Redis.Set(db.Context, codeCountKey, count+1, redis.KeepTTL)
 	} else {
 		db.Redis.Set(db.Context, codeCountKey, 1, time.Hour*24)
 	}

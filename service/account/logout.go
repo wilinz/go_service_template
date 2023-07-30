@@ -9,7 +9,7 @@ import (
 )
 
 func LogoutHandler(c *gin.Context) {
-	logged, _ := IsLogged(c)
+	logged, _ := IsLoggedWithResponse(c)
 	if !logged {
 		return
 	}
