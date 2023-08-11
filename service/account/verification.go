@@ -22,6 +22,16 @@ func InitAppName(name string) {
 	appName = name
 }
 
+// VerificationCodeHandler
+// @Summary Verification Code
+// @Description Handles sending verification code to the user
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param verificationCodeRequest body model.VerificationParameters true "Verification Code Request"
+// @Success 200 {object} model.JsonResponse[any]
+// @Failure 400 {object} model.JsonResponse[string]
+// @Router /account/verify [post]
 func VerificationCodeHandler(c *gin.Context) {
 	var p model.VerificationParameters
 	err := c.Bind(&p)
@@ -39,7 +49,7 @@ func VerificationCodeHandler(c *gin.Context) {
 		count, _ = db.Redis.Get(db.Context, codeCountKey).Int()
 		if count >= verification_code.SingleDayMaximum {
 			ttl := db.Redis.TTL(db.Context, codeCountKey).Val()
-			c.JSON(200, model.JsonResponse{
+			c.JSON(200, model.JsonResponse[string]{
 				Code: error_code.CodeExceededDailyMax,
 				Msg:  fmt.Sprintf("请 %s 后再试", ttl.String()),
 				Data: ttl.String(),
@@ -55,7 +65,7 @@ func VerificationCodeHandler(c *gin.Context) {
 	if ttl := db.Redis.TTL(db.Context, codeKey).Val(); ttl > 0 {
 		if elapsedTime := verification_code.CodeTTL - ttl; elapsedTime < time.Minute*1 {
 			countdown := verification_code.Interval - elapsedTime
-			c.JSON(200, model.JsonResponse{
+			c.JSON(200, model.JsonResponse[string]{
 				Code: error_code.RequestTooFrequent,
 				Msg:  fmt.Sprintf("请在 %s 后获取", countdown.String()),
 				Data: countdown.String(),
@@ -70,7 +80,7 @@ func VerificationCodeHandler(c *gin.Context) {
 	if util.IsEmail(p.PhoneOrEmail) {
 		err := tools.SendCodeToEmail(p.PhoneOrEmail, fmt.Sprintf("[%s]您的验证码是：%s。此验证码10分钟后失效，请勿泄露。", appName, code))
 		if err != nil {
-			c.JSON(200, model.JsonResponse{
+			c.JSON(200, model.JsonResponse[any]{
 				Code: error_code.SendCodeFailed,
 				Msg:  "发送验证码失败",
 				Data: nil,
@@ -81,7 +91,7 @@ func VerificationCodeHandler(c *gin.Context) {
 	} else if util.IsPhone(p.PhoneOrEmail) {
 		sendToPhone(p.PhoneOrEmail)
 	} else {
-		c.JSON(200, model.JsonResponse{
+		c.JSON(200, model.JsonResponse[any]{
 			Code: error_code.UsernameError,
 			Msg:  "手机号或邮箱错误",
 			Data: nil,

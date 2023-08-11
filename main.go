@@ -18,13 +18,32 @@ import (
 
 type ServiceConfig struct {
 	AppName           string                  `json:"app_name"`
+	Host              string                  `json:"host"`
+	Port              int                     `json:"port"`
+	BaseUrl           string                  `json:"base_url"`
+	UploadDir         string                  `json:"upload_dir"`
 	MysqlConfig       db.MysqlConfig          `json:"mysql_config"`
 	RedisConfig       db.RedisConfig          `json:"redis_config"`
 	EmailConfig       tools.EmailConfig       `json:"email_config"`
 	CustomProxyConfig proxy.CustomProxyConfig `json:"custom_proxy_config"`
 }
 
+// @title server_template API
+// @version 1.0
+// @description server_template API
+// @termsOfService https://github.com/wilinz/server_template
+
+// @contact.name API Support
+// @contact.url https://github.com/wilinz/server_template
+// @contact.email weilizan71@outlook.com
+
+// @in header
+
+// 下面注释按照项目实际的地址和路径进行设置
+// @host 127.0.0.1:10010
+// @BasePath /
 func main() {
+
 	log.SetFlags(log.Llongfile | log.LstdFlags)
 
 	// Define command line flags
@@ -38,6 +57,9 @@ func main() {
 		// Generate template configuration file
 		config := ServiceConfig{
 			AppName: "GoodApp",
+			Host:    "0.0.0.0",
+			Port:    10010,
+			BaseUrl: "",
 			MysqlConfig: db.MysqlConfig{
 				Host:     "localhost",
 				Port:     3306,
@@ -70,12 +92,12 @@ func main() {
 		}
 
 		// Write the configuration to a file
-		err = ioutil.WriteFile("service_config_temp.json", configJSON, 0644)
+		err = ioutil.WriteFile("service_config_temp.json5", configJSON, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println("Template configuration file generated at 'service_config_temp.json'")
+		fmt.Println("Template configuration file generated at 'service_config_temp.json5'")
 		return
 	}
 
@@ -104,11 +126,12 @@ func main() {
 	}
 
 	// Initialize the service using the configuration
-	account.InitAppName(config.AppName)
+	common.InitUploadSavePath(config.UploadDir)
 	db.InitMySql(config.MysqlConfig)
 	db.InitRedis(config.RedisConfig)
+	account.InitAppName(config.AppName)
 	tools.InitEmail(config.EmailConfig)
-	proxy.InitCustomProxy(config.CustomProxyConfig)
 	common.InitSessions()
-	route.Run()
+	proxy.InitCustomProxy(config.CustomProxyConfig)
+	route.Run(config.Host, config.Port)
 }

@@ -10,6 +10,16 @@ import (
 	"server_template/util"
 )
 
+// RegisterHandler
+// @Summary Register
+// @Description Handles user registration
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param registerRequest body model.RegistrationParameters true "Registration Request"
+// @Success 200 {object} model.JsonResponse[any]
+// @Failure 400 {object} model.JsonResponse[any]
+// @Router /account/register [post]
 func RegisterHandler(c *gin.Context) {
 	var p model.RegistrationParameters
 	err := c.Bind(&p)
@@ -40,7 +50,7 @@ func RegisterHandler(c *gin.Context) {
 		} else if util.IsPhone(p.Username) {
 			user.Phone = p.Username
 		} else {
-			c.JSON(200, model.JsonResponse{
+			c.JSON(200, model.JsonResponse[any]{
 				Code: error_code.UsernameError,
 				Msg:  "手机号或邮箱错误",
 				Data: nil,

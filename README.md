@@ -9,4 +9,14 @@
 ```
 
 ## 主函数在 cmd/main.go
-启动前请修改 db 文件夹里面的数据库配置，如果要发送邮件 请配置 tools/sendemail.go 里面的邮箱信息
+```shell
+./easywrite_service -g #生成模板配置文件
+```
+```shell
+./easywrite_service -c /path/to/config.json #指定配置文件，默认路径为 ./service_config.json5 , 使用默认路径可以不指定 -c
+```
+
+## 生成文档
+```shell
+swag init --parseDependency --parseInternal
+```

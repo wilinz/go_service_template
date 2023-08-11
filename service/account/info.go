@@ -7,6 +7,18 @@ import (
 	"server_template/service"
 )
 
+// SetUserInfoHandler 更新用户信息
+// @Summary 更新用户信息
+// @Description 更新用户的个人信息
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param cookie header string true "Cookie"
+// @Param info body model.UserInfo true "用户信息"
+// @Success 200 {object} model.JsonResponse[any] "成功"
+// @Failure 400 {object} model.JsonResponse[any] "请求参数错误"
+// @Failure 500 {object} model.JsonResponse[any] "服务器内部错误"
+// @Router /account/info [put]
 func SetUserInfoHandler(c *gin.Context) {
 	var p model.UserInfo
 	err := c.Bind(&p)
@@ -27,13 +39,23 @@ func SetUserInfoHandler(c *gin.Context) {
 		service.HttpServerInternalError(c)
 		return
 	}
-	c.JSON(200, model.JsonResponse{
+	c.JSON(200, model.JsonResponse[any]{
 		Code: 200,
 		Msg:  "ok",
 		Data: nil,
 	})
 }
 
+// GetUserInfoHandler 获取用户信息
+// @Summary 获取用户信息
+// @Description 获取用户的个人信息
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param cookie header string true "Cookie"
+// @Success 200 {object} model.JsonResponse[model.UserInfoReadOnly] "成功"
+// @Failure 500 {object} model.JsonResponse[any] "服务器内部错误"
+// @Router /account/info [get]
 func GetUserInfoHandler(c *gin.Context) {
 	logged, username := IsLoggedWithResponse(c)
 	if !logged {
@@ -46,7 +68,7 @@ func GetUserInfoHandler(c *gin.Context) {
 		service.HttpServerInternalError(c)
 		return
 	}
-	c.JSON(200, model.JsonResponse{
+	c.JSON(200, model.JsonResponse[model.UserInfoReadOnly]{
 		Code: 200,
 		Msg:  "ok",
 		Data: info,

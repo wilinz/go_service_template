@@ -21,7 +21,7 @@ func IsPasswordCorrect(c *gin.Context, username string, password string) bool {
 	errorCount, _ := db.Redis.Get(db.Context, key).Int()
 	if errorCount >= user_constant.PasswordTryMax {
 		ttl := db.Redis.TTL(db.Context, key).Val()
-		c.JSON(200, model.JsonResponse{
+		c.JSON(200, model.JsonResponse[string]{
 			Code: error_code.RequestTooFrequent,
 			Msg:  "请求过于频繁",
 			Data: ttl.String(),
@@ -34,7 +34,7 @@ func IsPasswordCorrect(c *gin.Context, username string, password string) bool {
 	err := db.Mysql.Select("password", "salt").Where("username=?", username).Take(&dbUser).Error
 	//如果不存在
 	if err != nil {
-		c.JSON(200, model.JsonResponse{
+		c.JSON(200, model.JsonResponse[any]{
 			Code: error_code.UserNotExist,
 			Msg:  "账号不存在",
 			Data: nil,
@@ -51,7 +51,7 @@ func IsPasswordCorrect(c *gin.Context, username string, password string) bool {
 	//更新计数
 	db.Redis.Set(db.Context, key, errorCount+1, redis.KeepTTL)
 
-	c.JSON(200, model.JsonResponse{
+	c.JSON(200, model.JsonResponse[any]{
 		Code: error_code.PasswordError,
 		Msg:  "密码错误",
 		Data: nil,
@@ -63,7 +63,7 @@ func IsAccountExists(c *gin.Context, username string) bool {
 	var count int64
 	db.Mysql.Model(&model.User{}).Where(map[string]any{"username": username}).Count(&count)
 	if count > 0 {
-		c.JSON(200, model.JsonResponse{
+		c.JSON(200, model.JsonResponse[any]{
 			Code: error_code.UserAlreadyExists,
 			Msg:  "账号已注册",
 			Data: nil,
@@ -81,7 +81,7 @@ func IsVerificationCodeCorrect(c *gin.Context, code, codeType, username string) 
 	if errorCount >= verification_code.TryMax {
 		db.Redis.Del(db.Context, codeKey)
 		db.Redis.Del(db.Context, TryCountKey)
-		c.JSON(200, model.JsonResponse{
+		c.JSON(200, model.JsonResponse[any]{
 			Code: error_code.PleaseReAcquire,
 			Msg:  "请重新获取",
 			Data: nil,
@@ -96,7 +96,7 @@ func IsVerificationCodeCorrect(c *gin.Context, code, codeType, username string) 
 	if err := codeCmd.Err(); err != nil {
 		log.Println(err)
 		log.Println("验证码不存在")
-		c.JSON(200, model.JsonResponse{
+		c.JSON(200, model.JsonResponse[any]{
 			Code: error_code.Unverified,
 			Msg:  "验证码错误",
 			Data: nil,
@@ -117,7 +117,7 @@ func IsVerificationCodeCorrect(c *gin.Context, code, codeType, username string) 
 	db.Redis.Set(db.Context, TryCountKey, errorCount+1, redis.KeepTTL)
 
 	log.Println("验证码错误")
-	c.JSON(200, model.JsonResponse{
+	c.JSON(200, model.JsonResponse[any]{
 		Code: error_code.Unverified,
 		Msg:  "Unverified",
 		Data: nil,
@@ -128,7 +128,7 @@ func IsVerificationCodeCorrect(c *gin.Context, code, codeType, username string) 
 func IsLoggedWithResponse(c *gin.Context) (bool, string) {
 	logged, username, err := IsLogged(c)
 	if !logged || err != nil {
-		c.JSON(http.StatusUnauthorized, model.JsonResponse{
+		c.JSON(http.StatusUnauthorized, model.JsonResponse[any]{
 			Code: error_code.Unverified,
 			Msg:  "请登录",
 			Data: nil,

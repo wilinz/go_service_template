@@ -10,6 +10,16 @@ import (
 	"server_template/util"
 )
 
+// ChangePasswordHandler
+// @Summary Change Password
+// @Description Handles password change for a user
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param changePasswordRequest body model.ChangePasswordParameters true "Change Password Request"
+// @Success 200 {object} model.JsonResponse[any]
+// @Failure 400 {object} model.JsonResponse[any]
+// @Router /account/password/change [put]
 func ChangePasswordHandler(c *gin.Context) {
 	var p model.ChangePasswordParameters
 	err := c.Bind(&p)
@@ -28,6 +38,16 @@ func ChangePasswordHandler(c *gin.Context) {
 	}
 }
 
+// ResetPasswordHandler
+// @Summary Reset Password
+// @Description Handles password reset for a user
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param resetPasswordRequest body model.ResetPasswordParameters true "Reset Password Request"
+// @Success 200 {object} model.JsonResponse[any]
+// @Failure 400 {object} model.JsonResponse[any]
+// @Router /account/password/reset [put]
 func ResetPasswordHandler(c *gin.Context) {
 	var p model.ResetPasswordParameters
 	if c.Bind(&p) != nil {
@@ -53,7 +73,7 @@ func UpdatePassword(username string, newPassword string) {
 
 func CheckPasswordIsLegal(c *gin.Context, password string) bool {
 	if !util.IsPasswordLegal(password) {
-		c.JSON(200, model.JsonResponse{
+		c.JSON(200, model.JsonResponse[any]{
 			Code: error_code.IllegalPassword,
 			Msg:  "密码至少包含 数字和英文，长度8-20",
 			Data: nil,

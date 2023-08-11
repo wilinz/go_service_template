@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"server_template/service/account"
-	"strings"
+	"server_template/util"
 	"time"
 )
 
@@ -57,7 +57,7 @@ func HttpProxyHandler(c *gin.Context) {
 	newUrl.RawQuery = q.Encode()
 
 	req, _ := http.NewRequest(c.Request.Method, newUrl.String(), c.Request.Body)
-	copyRequestHeader(c, req)
+	util.CopyRequestHeader(c, req)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -66,38 +66,7 @@ func HttpProxyHandler(c *gin.Context) {
 		return
 	}
 
-	copyResponseHeader(c, resp)
+	util.CopyResponseHeader(c, resp)
 	buf := make([]byte, 128)
 	io.CopyBuffer(c.Writer, resp.Body, buf)
-}
-
-func copyResponseHeader(c *gin.Context, resp *http.Response) {
-	cookies := resp.Cookies()
-	for _, cookie := range cookies {
-		cookie.SameSite = http.SameSiteNoneMode
-		cookie.Secure = true
-		c.Writer.Header().Add("Set-Cookie", cookie.String())
-	}
-	c.Writer.WriteHeader(resp.StatusCode)
-	for k, vList := range resp.Header {
-		if k != "Set-Cookie" {
-			for _, v := range vList {
-				c.Writer.Header().Add(k, v)
-			}
-		}
-	}
-}
-
-func copyRequestHeader(c *gin.Context, req *http.Request) {
-	for k, vList := range c.Request.Header {
-		newKey := k
-		if strings.HasPrefix(k, "X-") {
-			newKey = k[len("X-"):]
-			c.Request.Header.Del(newKey)
-			req.Header.Del(newKey)
-		}
-		for _, v := range vList {
-			req.Header.Add(newKey, v)
-		}
-	}
 }

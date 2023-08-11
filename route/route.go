@@ -1,8 +1,12 @@
 package route
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"server_template/common"
+	_ "server_template/docs"
 	"server_template/service/account"
 	"server_template/service/appversion"
 	"server_template/service/feedback"
@@ -10,7 +14,7 @@ import (
 	"server_template/service/welcome"
 )
 
-func Run() {
+func Run(host string, port int) {
 	r := gin.Default()
 	gin.SetMode(gin.DebugMode)
 	r.Use(func(c *gin.Context) {
@@ -18,6 +22,8 @@ func Run() {
 			c.Next()
 			log.Println(c.Writer.Header())*/
 	})
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	r.Static(common.UploadDir, common.UploadSavePath)
 	accountRouter := r.Group("/account")
 	accountRouter.POST("/login", account.LoginHandler)
@@ -38,7 +44,7 @@ func Run() {
 
 	r.Any("/proxy", proxy.HttpProxyHandler)
 
-	err := r.Run(":10011")
+	err := r.Run(fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
 		panic(err)
 	}

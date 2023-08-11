@@ -11,7 +11,7 @@ func WelcomeHandler(c *gin.Context) {
 	if !logged {
 		return
 	}
-	c.JSON(200, model.JsonResponse{
+	c.JSON(200, model.JsonResponse[any]{
 		Code: 200,
 		Msg:  "hello,you are logged in!",
 		Data: nil,

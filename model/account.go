@@ -43,7 +43,6 @@ type RegistrationParameters struct {
 
 type VerificationParameters struct {
 	PhoneOrEmail string `binding:"required" json:"phoneOrEmail"`
-	GraphicCode  string `json:"graphicCode"`
 	CodeType     string `binding:"required" json:"codeType"`
 }
 

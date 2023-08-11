@@ -1,7 +1,7 @@
 package model
 
-type JsonResponse struct {
+type JsonResponse[T any] struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
-	Data any    `json:"data"`
+	Data T      `json:"data"`
 }

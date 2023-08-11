@@ -11,6 +11,17 @@ import (
 	"server_template/util"
 )
 
+// LoginHandler
+// @Summary Login
+// @Description Handles user login with username and password
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param loginRequest body model.LoginParameters true "Login Request"
+// @Success 200 {object} model.JsonResponse[any]
+// @Failure 400 {object} model.JsonResponse[any]
+// @Header 200 {string} Set-Cookie "session-key=<session_key>; Path=/"
+// @Router /account/login [post]
 func LoginHandler(c *gin.Context) {
 	var user model.LoginParameters
 	err := c.Bind(&user)
@@ -23,6 +34,17 @@ func LoginHandler(c *gin.Context) {
 	}
 }
 
+// LoginWithCodeHandler
+// @Summary Login with verification code
+// @Description Handles user login with verification code
+// @Tags Account
+// @Accept json
+// @Produce json
+// @Param loginWithCodeRequest body model.UseCodeLoginParameters true "Login With Code Request"
+// @Success 200 {object} model.JsonResponse[any]
+// @Failure 400 {object} model.JsonResponse[any]
+// @Header 200 {string} Set-Cookie "session-key=<session_key>; Path=/"
+// @Router /account/login_with_code [post]
 func LoginWithCodeHandler(c *gin.Context) {
 	var user model.UseCodeLoginParameters
 	err := c.Bind(&user)

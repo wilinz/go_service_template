@@ -17,6 +17,14 @@ import (
 )
 
 // PostFeedbackHandler 定义处理反馈的函数
+// @Summary 提交反馈
+// @Description 处理用户提交的反馈信息
+// @Accept multipart/form-data
+// @Produce json
+// @Param feedbackData formData model.Feedback true "反馈数据"
+// @Success 200 {object} model.JsonResponse[any]
+// @Failure 400 {object} model.JsonResponse[any]
+// @Router /feedback [post]
 func PostFeedbackHandler(c *gin.Context) {
 
 	feedbackData := model.Feedback{}
@@ -62,7 +70,7 @@ func PostFeedbackHandler(c *gin.Context) {
 	}
 
 	// 返回处理结果
-	c.JSON(http.StatusOK, model.JsonResponse{
+	c.JSON(http.StatusOK, model.JsonResponse[any]{
 		Code: 200,
 		Msg:  "ok",
 		Data: nil,
